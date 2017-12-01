@@ -10,8 +10,7 @@ from sklearn import metrics
 flights = pd.read_csv('data/discretized_flights_data.csv')
 
 X = flights[['DAY_OF_YEAR','DAY_OF_WEEK','AIRLINE','FLIGHT_NUMBER','ORIGIN_AIRPORT',
-						'DESTINATION_AIRPORT','SCHEDULED_DEPARTURE','SCHEDULED_ARRIVAL', 
-						'ARRIVAL_TIME','ELAPSED_TIME']]
+						'DESTINATION_AIRPORT','SCHEDULED_DEPARTURE','SCHEDULED_ARRIVAL', 'ELAPSED_TIME']]
 y = flights['ARRIVAL_DELAY']
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
@@ -30,7 +29,7 @@ y_predict_lasso = lasso.predict(X_test)
 print 'Lasso Mean squared error: {}'.format(math.sqrt(mean_squared_error(y_predict_lasso, y_test)))
 print 'Lasso Median absolute error: {}'.format(median_absolute_error(y_predict_lasso, y_test))
 
-nn = MLPRegressor(verbose=True)
+nn = MLPRegressor(verbose=True, max_iter=10)
 nn.fit(X_train, y_train)
 
 y_predict_nn = nn.predict(X_test)
