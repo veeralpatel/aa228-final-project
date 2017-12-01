@@ -1,5 +1,6 @@
 import pandas as pd
 import datetime
+import pickle
 
 def clean_data():
 	flights = pd.read_csv('data/flights.csv')
@@ -16,13 +17,19 @@ def clean_data():
 	mask = (flights['ORIGIN_AIRPORT'].str.len() == 3) & (flights['DESTINATION_AIRPORT'].str.len() == 3)
 	flights = flights.loc[mask]
 
+	airport_score = {}
+	with open('airport_score.pickle', 'rb') as handle:
+		airport_score = pickle.load(handle)
+	flights['ORIGIN_SCORE'] = flights.apply(lambda row: airport_score[row.ORIGIN_AIRPORT], axis=1)
+	flights['DESTINATION_SCORE'] = flights.apply(lambda row: airport_score[row.DESTINATION_AIRPORT], axis=1)
+
 # 	kept_vars = ['DAY_OF_WEEK','AIRLINE', 'FLIGHT_NUMBER','ORIGIN_AIRPORT',
 #				'DESTINATION_AIRPORT','SCHEDULED_DEPARTURE','ELAPSED_TIME',
 #				'SCHEDULED_ARRIVAL','ARRIVAL_TIME','ARRIVAL_DELAY','CANCELLED',]
 
 	flights = flights[['DAY_OF_YEAR','DAY_OF_WEEK','AIRLINE','FLIGHT_NUMBER','ORIGIN_AIRPORT',
 						'DESTINATION_AIRPORT','SCHEDULED_DEPARTURE','SCHEDULED_ARRIVAL', 
-						'ARRIVAL_TIME','ARRIVAL_DELAY','ELAPSED_TIME']]
+						'ARRIVAL_TIME','ARRIVAL_DELAY','ELAPSED_TIME','ORIGIN_SCORE','DESTINATION_SCORE']]
 
 	flights.to_csv('data/clean_flights.csv', index=False)
 
