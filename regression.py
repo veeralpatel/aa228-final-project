@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn import linear_model
-from sklearn.neural_network import MLPRegressor
 from sklearn.metrics import mean_squared_error, median_absolute_error
 import math
 from sklearn import metrics
@@ -10,7 +9,7 @@ from sklearn import metrics
 flights = pd.read_csv('data/discretized_flights_data.csv')
 
 X = flights[['DAY_OF_YEAR','DAY_OF_WEEK','AIRLINE','FLIGHT_NUMBER','ORIGIN_AIRPORT',
-						'DESTINATION_AIRPORT','SCHEDULED_DEPARTURE','SCHEDULED_ARRIVAL', 'ELAPSED_TIME']]
+						'DESTINATION_AIRPORT','SCHEDULED_DEPARTURE','SCHEDULED_ARRIVAL']]
 y = flights['ARRIVAL_DELAY']
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
@@ -29,9 +28,10 @@ y_predict_lasso = lasso.predict(X_test)
 print 'Lasso Mean squared error: {}'.format(math.sqrt(mean_squared_error(y_predict_lasso, y_test)))
 print 'Lasso Median absolute error: {}'.format(median_absolute_error(y_predict_lasso, y_test))
 
-nn = MLPRegressor(verbose=True, max_iter=10)
-nn.fit(X_train, y_train)
+ridge = linear_model.Ridge(alpha=0.3, copy_X=True, fit_intercept=True, max_iter=None,
+   normalize=False, random_state=None, solver='auto', tol=0.001)
+ridge.fit(X_train, y_train)
 
-y_predict_nn = nn.predict(X_test)
-print 'Neural net Mean squared error: {}'.format(math.sqrt(mean_squared_error(y_predict_nn, y_test)))
-print 'Neural net Median absolute error: {}'.format(median_absolute_error(y_predict_nn, y_test))
+y_predict_ridge = ridge.predict(X_test)
+print 'Ridge Mean squared error: {}'.format(math.sqrt(mean_squared_error(y_predict_ridge, y_test)))
+print 'Ridge Median absolute error: {}'.format(median_absolute_error(y_predict_ridge, y_test))
