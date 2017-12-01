@@ -13,6 +13,9 @@ def clean_data():
 							'DEPARTURE_TIME','SCHEDULED_TIME', 'AIR_TIME']
 	flights.drop(variables_to_remove, axis = 1, inplace = True)
 
+	mask = (flights['ORIGIN_AIRPORT'].str.len() == 3) & (flights['DESTINATION_AIRPORT'].str.len() == 3)
+	flights = flights.loc[mask]
+
 # 	kept_vars = ['DAY_OF_WEEK','AIRLINE', 'FLIGHT_NUMBER','ORIGIN_AIRPORT',
 #				'DESTINATION_AIRPORT','SCHEDULED_DEPARTURE','ELAPSED_TIME',
 #				'SCHEDULED_ARRIVAL','ARRIVAL_TIME','ARRIVAL_DELAY','CANCELLED',]
