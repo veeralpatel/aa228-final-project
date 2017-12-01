@@ -1,3 +1,4 @@
 flights.csv
 .ipynb_checkpoints/
 clean_flights.csv
+discretized_flights_data.csv
