@@ -1,5 +1,6 @@
 import pandas as pd
 import datetime
+import pickle
 
 #_________________________________________________________
 # Function that convert the 'HHMM' string to datetime.time
@@ -61,14 +62,12 @@ def clean_data():
 
 	flights.drop(['YEAR','MONTH','DAY', 'DATE'], axis=1, inplace=True)
 
-
 # 	kept_vars = ['DAY_OF_WEEK','AIRLINE', 'FLIGHT_NUMBER','ORIGIN_AIRPORT',
 #				'DESTINATION_AIRPORT','SCHEDULED_DEPARTURE','ELAPSED_TIME',
 #				'SCHEDULED_ARRIVAL','ARRIVAL_TIME','ARRIVAL_DELAY','CANCELLED',]
 
 	flights = flights[['DAY_OF_YEAR','AIRLINE','FLIGHT_NUMBER','ORIGIN_AIRPORT',
 						'DESTINATION_AIRPORT','SCHEDULED_DEPARTURE','SCHEDULED_ARRIVAL', 
-						'ARRIVAL_TIME','ARRIVAL_DELAY','ELAPSED_TIME', 'CANCELLED']]
 
 	flights.to_csv('data/official_clean_flights.csv', index=False)
 

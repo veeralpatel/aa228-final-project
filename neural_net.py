@@ -10,12 +10,12 @@ from sklearn.externals import joblib
 flights = pd.read_csv('data/discretized_flights_data.csv')
 
 X = flights[['DAY_OF_YEAR','DAY_OF_WEEK','AIRLINE','FLIGHT_NUMBER','ORIGIN_AIRPORT',
-						'DESTINATION_AIRPORT','SCHEDULED_DEPARTURE','SCHEDULED_ARRIVAL']]
+						'DESTINATION_AIRPORT','SCHEDULED_DEPARTURE','SCHEDULED_ARRIVAL','ORIGIN_SCORE', 'DESTINATION_SCORE']]
 y = flights['ARRIVAL_DELAY']
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.01)
 
-nn = MLPRegressor(verbose=True, max_iter=10)
+nn = MLPRegressor(verbose=True, hidden_layer_sizes=(256,128))
 nn.fit(X_train, y_train)
 
 y_predict_nn = nn.predict(X_test)
