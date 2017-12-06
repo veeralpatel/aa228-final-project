@@ -30,16 +30,16 @@ class FlightMDP(util.MDP):
         all_actions = []
 
         origin = state[0]
-        today_tomorrow_flights = all_flights[origin][str(state[1].timetuple().tm_yday)] + all_flights[origin][str(state[1].timetuple().tm_yday+1)]
-        print today_tomorrow_flights
+
+        today_tomorrow_flights = all_flights[origin][state[1].timetuple().tm_yday] + all_flights[origin][state[1].timetuple().tm_yday+1]
         for flight in today_tomorrow_flights:
-            if hours_between(flight[3], state[1]) <= 24:
+            dt = datetime.datetime.strptime(flight[3], '%Y-%m-%d %H:%M:%S')
+            if hours_between(dt, state[1]) <= 24:
                 # flight number, departure time, destination, real arrival time, elapsed time
-                all_actions.append((flight[0],flight[3],flight[2],flight[4],flight[5]))
+                all_actions.append((flight[0],datetime.datetime.strptime(flight[3], '%Y-%m-%d %H:%M:%S'),flight[2],datetime.datetime.strptime(flight[4], '%Y-%m-%d %H:%M:%S'),flight[5]))
             else:
                 break
 
-        print all_actions
         if len(all_actions) == 0:
             return [('QUIT',None,None,None,None)]
         else:
@@ -66,22 +66,31 @@ class FlightMDP(util.MDP):
         if currentLocation == self.final_destination:
             return []
         else:
+            delta_between_flights = (departure_time - currentDatetime).total_seconds()
+            # delta_between_flights = delta_between_flights.total_seconds()
+
             # cancelled flight 
             succCancelled = (currentLocation, departure_time)
             probCancelled = 0.2
-            rewardCancelled = 1/float((departure_time - currentDatetime).total_seconds())
+            if delta_between_flights != 0:
+                rewardCancelled = 1/float((departure_time - currentDatetime).total_seconds())
+            else:
+                rewardCancelled = 0
 
             # regular flight, not cancelled
             succ = (destination, real_arrival_time)
             prob = 1
-            reward = 1/float((departure_time - currentDatetime).total_seconds()) + 1/float(60*elapsed_time)
+            if delta_between_flights != 0:
+                reward = 1/float((departure_time - currentDatetime).total_seconds()) + 1/float(60*elapsed_time)
+            else:
+                reward = 1/float(60*elapsed_time)
 
             return [(succCancelled, probCancelled, rewardCancelled), (succ, prob, reward)]
 
     def discount(self):
         return 1
 
-mdp = FlightMDP(origin='EWR', start_time=datetime.datetime(2015, 10, 30, 8, 30), final_destination='SFO')
+mdp = FlightMDP(origin='EWR', start_time=datetime.datetime(2015, 1, 11, 8, 30), final_destination='SFO')
 alg = util.ValueIteration()
 alg.solve(mdp, .0001)
 
