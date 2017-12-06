@@ -26,8 +26,6 @@ class ValueIteration(MDPAlgorithm):
         print 'done computing'
         print len(mdp.states)
         def computeQ(mdp, V, state, action):
-            print 'computing q for '
-            print state, action
             # Return Q(state, action) based on V(state).
             return sum(prob * (reward + mdp.discount() * V[newState]) \
                             for newState, prob, reward in mdp.succAndProbReward(state, action))

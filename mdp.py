@@ -30,9 +30,6 @@ class FlightMDP(util.MDP):
         all_actions = []
 
         origin = state[0]
-        print all_flights
-        print all_flights[origin]
-
         today_tomorrow_flights = all_flights[origin][str(state[1].timetuple().tm_yday)] + all_flights[origin][str(state[1].timetuple().tm_yday+1)]
         print today_tomorrow_flights
         for flight in today_tomorrow_flights:
