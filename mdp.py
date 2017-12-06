@@ -2,10 +2,11 @@ import util, math, random
 from collections import defaultdict
 from util import ValueIteration
 import datetime
+import pickle
 
 all_flights = {}
-with open(r"someobject.pickle", "rb") as input_file:
-    all_flights = cPickle.load(input_file)
+with open(r"airport_to_flights_dict.pkl", "rb") as input_file:
+    all_flights = pickle.load(input_file)
 
 def hours_between(d1, d2):
     return divmod((d1 - d2).total_seconds(), 3600)[0]
@@ -31,7 +32,7 @@ class FlightMDP(util.MDP):
         for flight in today_tomorrow_flights:
             if hours_between(flight['departure_time'], state[1]) <= 24:
                 # flight number, departure time, destination, real arrival time, elapsed time
-                all_actions.append((flight[0],flight[1],flight[2],flight[3],flight[4]))
+                all_actions.append((flight[0],flight[3],flight[2],flight[4],flight[5]))
             else:
                 break
 

@@ -46,6 +46,7 @@ class ValueIteration(MDPAlgorithm):
                 V = newV
                 break
             V = newV
+            print V[(self.origin, self.start_time)]
 
         # Compute the optimal policy now
         pi = computeOptimalPolicy(mdp, V)
@@ -83,6 +84,7 @@ class MDP:
             for action in self.actions(state):
                 for newState, prob, reward in self.succAndProbReward(state, action):
                     if newState not in self.states:
+                        print newState
                         self.states.add(newState)
                         queue.append(newState)
         # print "%d states" % len(self.states)
