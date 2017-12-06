@@ -8,8 +8,6 @@ flights_df = pd.read_csv('data/official_clean_flights.csv')
 dd_list = functools.partial(defaultdict, list)
 airport_to_flights = defaultdict(dd_list)
 
-
-
 for _, row in flights_df.iterrows():
     flight_num = row.AIRLINE + str(row.FLIGHT_NUMBER)
     flight = (flight_num, row.ORIGIN_AIRPORT, row.DESTINATION_AIRPORT, row.SCHEDULED_DEPARTURE, 
