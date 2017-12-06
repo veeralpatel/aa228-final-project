@@ -2,11 +2,13 @@ import util, math, random
 from collections import defaultdict
 from util import ValueIteration
 import datetime
-import pickle
+import cPickle
 
+print 'loading pkl'
 all_flights = {}
 with open(r"airport_to_flights_dict.pkl", "rb") as input_file:
-    all_flights = pickle.load(input_file)
+    all_flights = cPickle.load(input_file)
+print 'done loading pkl'
 
 def hours_between(d1, d2):
     return divmod((d1 - d2).total_seconds(), 3600)[0]
@@ -28,15 +30,23 @@ class FlightMDP(util.MDP):
         all_actions = []
 
         origin = state[0]
-        today_tomorrow_flights = all_flights[origin][state[1].timetuple().tm_yday] + all_flights[origin][state[1].timetuple().tm_yday+1]
+        print all_flights
+        print all_flights[origin]
+
+        today_tomorrow_flights = all_flights[origin][str(state[1].timetuple().tm_yday)] + all_flights[origin][str(state[1].timetuple().tm_yday+1)]
+        print today_tomorrow_flights
         for flight in today_tomorrow_flights:
-            if hours_between(flight['departure_time'], state[1]) <= 24:
+            if hours_between(flight[3], state[1]) <= 24:
                 # flight number, departure time, destination, real arrival time, elapsed time
                 all_actions.append((flight[0],flight[3],flight[2],flight[4],flight[5]))
             else:
                 break
 
-        return all_actions
+        print all_actions
+        if len(all_actions) == 0:
+            return [('QUIT',None,None,None,None)]
+        else:
+            return all_actions
 
     # Given a |state| and |action|, return a list of (newState, prob, reward) tuples
     # corresponding to the states reachable from |state| when taking |action|.
@@ -44,6 +54,9 @@ class FlightMDP(util.MDP):
     # * Indicate a terminal state (i.e. reaching the final destination airport) by setting the current airport to self.final_destination
     # * and returning an empty list (no more actions to take)
     def succAndProbReward(self, state, action):
+        if action[0] == 'QUIT':
+            return []
+
         currentLocation = state[0]
         currentDatetime = state[1]
 
