@@ -34,7 +34,7 @@ class FlightMDP(util.MDP):
         today_tomorrow_flights = all_flights[origin][state[1].timetuple().tm_yday] + all_flights[origin][state[1].timetuple().tm_yday+1]
         for flight in today_tomorrow_flights:
             dt = datetime.datetime.strptime(flight[3], '%Y-%m-%d %H:%M:%S')
-            if hours_between(dt, state[1]) <= 24:
+            if hours_between(dt, self.start_time) <= 24:
                 # flight number, departure time, destination, real arrival time, elapsed time
                 all_actions.append((flight[0],datetime.datetime.strptime(flight[3], '%Y-%m-%d %H:%M:%S'),flight[2],datetime.datetime.strptime(flight[4], '%Y-%m-%d %H:%M:%S'),flight[5]))
             else:
