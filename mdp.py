@@ -3,13 +3,18 @@ from collections import defaultdict
 from util import ValueIteration
 import datetime
 
+all_flights = {}
+with open(r"someobject.pickle", "rb") as input_file:
+    all_flights = cPickle.load(input_file)
+
 def hours_between(d1, d2):
     return divmod((d1 - d2).total_seconds(), 3600)[0]
 
 class FlightMDP(util.MDP):
-    def __init__(self, origin, start_time):
+    def __init__(self, origin, final_destination, start_time):
         self.origin = origin
         self.start_time = start_time
+        self.final_destination = final_destination
 
     # Return the start state.
     # States are your current airport and datetime
@@ -25,7 +30,8 @@ class FlightMDP(util.MDP):
         today_tomorrow_flights = all_flights[origin][state[1].timetuple().tm_yday] + all_flights[origin][state[1].timetuple().tm_yday+1]
         for flight in today_tomorrow_flights:
             if hours_between(flight['departure_time'], state[1]) <= 24:
-                all_actions.append({'dest'=flight[0],'ayo':flight[1],'no':flight[2],'lol':flight[3],'lmao':flight[4]})
+                # flight number, departure time, destination, real arrival time, elapsed time
+                all_actions.append((flight[0],flight[1],flight[2],flight[3],flight[4]))
             else:
                 break
 
@@ -37,58 +43,34 @@ class FlightMDP(util.MDP):
     # * Indicate a terminal state (i.e. reaching the final destination airport) by setting the current airport to self.final_destination
     # * and returning an empty list (no more actions to take)
     def succAndProbReward(self, state, action):
-        states_reachable = []
+        currentLocation = state[0]
+        currentDatetime = state[1]
 
-        # currentLocation = state[0]
-        # currentDay = state[1]
-        # currentTime = state[2]
+        flight_number = action[0]
+        departure_time = action[1]
+        destination = action[2]
+        real_arrival_time = action[3]
+        elapsed_time = action[4]
 
+        if currentLocation == self.final_destination:
+            return []
+        else:
+            # cancelled flight 
+            succCancelled = (currentLocation, departure_time)
+            probCancelled = 0.2
+            rewardCancelled = 1/float((departure_time - currentDatetime).total_seconds())
 
+            # regular flight, not cancelled
+            succ = (destination, real_arrival_time)
+            prob = 1
+            reward = 1/float((departure_time - currentDatetime).total_seconds()) + 1/float(60*elapsed_time)
 
-        # if currentLocation == self.final_destination:
-        #     return []
-        # if action == 'Take Flight X':
-        #     states_reachable.append(((state[0], None, None), 1.0, state[0]))
-        #     return states_reachable
-        # if action == ''
-        # elif action == 'Peek' and state[1] == None:
-        #     for i in range(len(deck)):
-        #         if deck[i] != 0:
-        #             ind_count = deck[i]
-        #             states_reachable.append(((state[0], i, deck), ind_count/float(deckCount), -self.peekCost))
-        #     return states_reachable
-        # elif action == 'Take' and state[1] == None:
-        #     # we didn't peak before
-        #     for i in range(len(deck)):
-        #         if deck[i] != 0:
-        #             newValue = state[0]+self.cardValues[i]
-        #             currentCardCount = deck[i]
-        #             newDeck = list(deck[:])
-        #             newDeck[i] = newDeck[i]-1
-        #             if newValue > self.threshold:
-        #                 states_reachable.append(((newValue, None, None), currentCardCount/float(deckCount), 0))
-        #             else:
-        #                 newTotal = sum([v for v in list(newDeck)])
-        #                 if newTotal == 0:
-        #                     states_reachable.append(((newValue, None, None), 1.0, newValue))
-        #                 else:
-        #                     states_reachable.append(((newValue, None, tuple(newDeck)), currentCardCount/float(deckCount), 0))
-        #     return states_reachable
-        # elif action == 'Take' and state[1] != None:
-        #     new_state = state[0] + self.cardValues[state[1]]
-        #     if new_state > self.threshold:
-        #         states_reachable.append(((new_state, None, None), 1.0, 0))
-        #     else:
-        #         newDeck = list(deck[:])
-        #         newDeck[state[1]] = newDeck[state[1]] - 1
-        #         states_reachable.append(((new_state, None, tuple(newDeck)), 1.0, 0))
-        #     return states_reachable
-        return states_reachable
+            return [(succCancelled, probCancelled, rewardCancelled), (succ, prob, reward)]
 
     def discount(self):
         return 1
 
-mdp = FlightMDP(origin='EWR', start_time=datetime.datetime(2015, 10, 30, 8, 30))
+mdp = FlightMDP(origin='EWR', start_time=datetime.datetime(2015, 10, 30, 8, 30), final_destination='SFO')
 alg = util.ValueIteration()
 alg.solve(mdp, .0001)
 
