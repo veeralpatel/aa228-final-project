@@ -23,10 +23,10 @@ class ValueIteration(MDPAlgorithm):
     '''
     def solve(self, mdp, epsilon=0.001):
         print 'computing states'
-        #mdp.computeStates()
-        with open('EWR_states.pkl', 'rb') as f:
-            states = pickle.load(f)
-        mdp.states = states
+        mdp.computeStates()
+        # with open('EWR_states.pkl', 'rb') as f:
+        #     states = pickle.load(f)
+        # mdp.states = states
         print 'done computing'
         print len(mdp.states)
         with open('EWR_states.pkl', 'wb') as f:
@@ -56,9 +56,7 @@ class ValueIteration(MDPAlgorithm):
                 # This evaluates to zero for end states, which have no available actions (by definition)
                 newV[state] = max(computeQ(mdp, V, state, action) for action in mdp.actions(state))
             numIters += 1
-            if numIters == 100:
-                break
-            if max(abs(V[state] - newV[state]) for state in mdp.states) < epsilon:
+            if min(abs(V[state] - newV[state]) for state in mdp.states) < epsilon:
                 V = newV
                 break
             V = newV
