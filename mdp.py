@@ -40,7 +40,7 @@ class FlightMDP(util.MDP):
         currentTime = state[1]
 
         if origin == self.final_destination:
-            return [('QUIT',None,None,None,None)]
+            return [('DONE',None,None,None,None)]
 
         today_tomorrow_flights = all_flights[origin][state[1].timetuple().tm_yday] + all_flights[origin][state[1].timetuple().tm_yday+1]
         for flight in today_tomorrow_flights:
@@ -50,12 +50,13 @@ class FlightMDP(util.MDP):
             scheduledDeparture = convertToDateTime(flight[3])
             arrivalTime = convertToDateTime(flight[4])
             elapsedTime = flight[5]
+
+            if hours_between(scheduledDeparture, self.start_time) > 24:
+                break 
             
-            if arrivalTime > scheduledDeparture and hours_between(scheduledDeparture, self.start_time) <= 24 and scheduledDeparture > currentTime:
+            if arrivalTime > scheduledDeparture and scheduledDeparture > currentTime:
                 # flight number, departure time, destination, real arrival time, elapsed time
                 all_actions.append((flightNumber, scheduledDeparture, destinationAirport, arrivalTime, elapsedTime))
-            else:
-                break
         if len(all_actions) == 0:
             return [('QUIT',None,None,None,None)]
         else:
@@ -67,8 +68,10 @@ class FlightMDP(util.MDP):
     # * Indicate a terminal state (i.e. reaching the final destination airport) by setting the current airport to self.final_destination
     # * and returning an empty list (no more actions to take)
     def succAndProbReward(self, state, action):
-        if action[0] == 'QUIT':
+        if action[0] == 'DONE':
             return []
+        else if action[0] == 'QUIT':
+            return [('QUIT',None,None,None,None),1.0,float('-inf')]
 
         currentLocation = state[0]
         currentDatetime = state[1]
@@ -91,7 +94,7 @@ class FlightMDP(util.MDP):
 
             # regular flight, not cancelled
             succ = (destination, real_arrival_time)
-            prob = 1
+            prob = 0.8
             reward = delta_between_flights - elapsed_time
 
             return [(succCancelled, probCancelled, 0), (succ, prob, reward)]
@@ -111,9 +114,6 @@ with open('value_function.pickle', 'wb') as handle:
 
 with open('optimal_policy.pickle', 'wb') as handle:
     pickle.dump(alg.pi, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-with open('mdp.pickle', 'wb') as handle:
-    pickle.dump(mdp, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 print 'dumped new policies'
 

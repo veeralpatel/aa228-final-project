@@ -62,7 +62,7 @@ class ValueIteration(MDPAlgorithm):
                 V = newV
                 break
             V = newV
-            # print V[(mdp.origin, mdp.start_time)]
+            print V[(mdp.origin, mdp.start_time)]
             print computeOptimalStartingAction(mdp, (mdp.origin, mdp.start_time), V)
 
         # Compute the optimal policy now
