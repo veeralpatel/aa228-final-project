@@ -71,7 +71,7 @@ class FlightMDP(util.MDP):
         if action[0] == 'DONE':
             return []
         elif action[0] == 'QUIT':
-            return [('QUIT',None,None,None,None),1.0,float('-inf')]
+            return [(('QUIT',None,None,None,None),1.0,float('-inf'))]
 
         currentLocation = state[0]
         currentDatetime = state[1]
