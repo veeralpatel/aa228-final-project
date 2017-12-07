@@ -5,6 +5,9 @@ import datetime
 import cPickle
 import pickle
 from scipy.stats import truncnorm
+import numpy as np
+
+np.random.seed(11)
 
 print 'loading pkl'
 all_flights = {}
