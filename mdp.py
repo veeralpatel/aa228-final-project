@@ -112,21 +112,24 @@ with open('value_function.pickle', 'wb') as handle:
 with open('optimal_policy.pickle', 'wb') as handle:
     pickle.dump(alg.pi, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
+with open('mdp.pickle', 'wb') as handle:
+    pickle.dump(mdp, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
 print 'dumped new policies'
 
-print 'printing final path'
+# print 'printing final path'
 
-state = (mdp.origin, mdp.start_time)
-path = []
-while True:
-    if state[0] == 'SFO':
-        break
-    else:
-        action = alg.pi[state]
-        path.append(action)
-        state = (action[2],action[3])
+# state = (mdp.origin, mdp.start_time)
+# path = []
+# while True:
+#     if state[0] == 'SFO':
+#         break
+#     else:
+#         action = alg.pi[state]
+#         path.append(action)
+#         state = (action[2],action[3])
         
-print path
+# print path
 
 ############################################################
 # Problem 4a: Q learning
