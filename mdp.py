@@ -41,6 +41,8 @@ class FlightMDP(util.MDP):
 
         if origin == self.final_destination:
             return [('DONE',None,None,None,None)]
+        if origin == 'QUIT':
+            return [('DONE',None,None,None,None)]
 
         today_tomorrow_flights = all_flights[origin][state[1].timetuple().tm_yday] + all_flights[origin][state[1].timetuple().tm_yday+1]
         for flight in today_tomorrow_flights:
