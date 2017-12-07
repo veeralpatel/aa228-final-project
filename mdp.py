@@ -4,6 +4,7 @@ from util import ValueIteration
 import datetime
 import cPickle
 import pickle
+from scipy.stats import truncnorm
 
 print 'loading pkl'
 all_flights = {}
@@ -19,6 +20,10 @@ def minutes_between(d1, d2):
 
 def convertToDateTime(str):
     return datetime.datetime.strptime(str, '%Y-%m-%d %H:%M:%S')
+
+def get_truncated_normal(mean=0, sd=1, low=0, upp=10):
+    return truncnorm(
+        (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
 
 class FlightMDP(util.MDP):
     def __init__(self, initial_origin, final_destination, start_time, prune_direct):
@@ -103,14 +108,15 @@ class FlightMDP(util.MDP):
             # regular flight, not cancelled
             succ = (destination, real_arrival_time)
             prob = 0.8
-            reward = delta_between_flights - elapsed_time
+            noisy_elapsed_time = get_truncated_normal(mean=elapsed_time, sd=30, low=elapsed_time, upp=elapsed_time+120)
+            reward = delta_between_flights - noisy_elapsed_time.rvs()
 
             return [(succCancelled, probCancelled, 0), (succ, prob, reward)]
 
     def discount(self):
         return 1
 
-mdp = FlightMDP(initial_origin='EWR', start_time=datetime.datetime(2015, 1, 11, 8, 30), final_destination='SFO', prune_direct=True)
+mdp = FlightMDP(initial_origin='EWR', start_time=datetime.datetime(2015, 1, 11, 8, 30), final_destination='SFO', prune_direct=False)
 alg = util.ValueIteration()
 alg.solve(mdp, 0.1)
 
