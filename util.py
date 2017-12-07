@@ -23,10 +23,10 @@ class ValueIteration(MDPAlgorithm):
     '''
     def solve(self, mdp, epsilon=0.001):
         print 'computing states'
-        mdp.computeStates()
-        # with open('EWR_states.pkl', 'rb') as f:
-        #     states = pickle.load(f)
-        # mdp.states = states
+        #mdp.computeStates()
+        with open('EWR_states.pkl', 'rb') as f:
+            states = pickle.load(f)
+        mdp.states = states
         print 'done computing'
         print len(mdp.states)
         with open('EWR_states.pkl', 'wb') as f:

@@ -1,16 +1,10 @@
-import util, math, random
+import util, math, random, datetime, sys, argparse
 from collections import defaultdict
 from util import ValueIteration
-import datetime
-import cPickle
-import pickle
+import numpy as np
+import cPickle as pickle
 from scipy.stats import truncnorm
 
-print 'loading pkl'
-all_flights = {}
-with open(r"airport_to_flights_dict.pkl", "rb") as input_file:
-    all_flights = cPickle.load(input_file)
-print 'done loading pkl'
 
 def hours_between(d1, d2):
     return divmod((d1 - d2).total_seconds(), 3600)[0]
@@ -116,9 +110,32 @@ class FlightMDP(util.MDP):
     def discount(self):
         return 1
 
-mdp = FlightMDP(initial_origin='EWR', start_time=datetime.datetime(2015, 1, 11, 8, 30), final_destination='SFO', prune_direct=False)
+
+# parse input args
+parser = argparse.ArgumentParser()
+parser.add_argument('--pruneDirect', action='store', dest='prune_direct', type=bool, default=False)
+parser.add_argument('--epsilon', action='store', dest='epsilon', type=float, default=0.1)
+parser.add_argument('--origin', action='store', dest='initial_origin', type=str, default='EWR')
+parser.add_argument('--destination', action='store', dest='final_destination', type=str, default='SFO')
+results = parser.parse_args()
+
+# set vars to parser arguments or defaults
+prune_direct = results.prune_direct
+epsilon = results.epsilon
+initial_origin = results.initial_origin
+destination = results.final_destination
+
+print 'loading pkl'
+all_flights = {}
+with open(r"airport_to_flights_dict.pkl", "rb") as input_file:
+    all_flights = pickle.load(input_file)
+print 'done loading pkl'
+
+np.random.seed(11)
+
+mdp = FlightMDP(initial_origin=initial_origin, start_time=datetime.datetime(2015, 1, 11, 8, 30), final_destination=destination, prune_direct=prune_direct)
 alg = util.ValueIteration()
-alg.solve(mdp, 0.1)
+alg.solve(mdp, epsilon)
 
 # print alg.V
 # print alg.pi
