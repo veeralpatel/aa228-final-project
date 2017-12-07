@@ -70,7 +70,7 @@ class FlightMDP(util.MDP):
     def succAndProbReward(self, state, action):
         if action[0] == 'DONE':
             return []
-        else if action[0] == 'QUIT':
+        elif action[0] == 'QUIT':
             return [('QUIT',None,None,None,None),1.0,float('-inf')]
 
         currentLocation = state[0]
