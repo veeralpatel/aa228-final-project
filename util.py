@@ -44,7 +44,11 @@ class ValueIteration(MDPAlgorithm):
                 pi[state] = max((computeQ(mdp, V, state, action), action) for action in mdp.actions(state))[1]
             return pi
 
+        def computeOptimalStartingAction(mdp, start_state, V):
+            return max((computeQ(mdp, V, start_state, action), action) for action in mdp.actions(start_state))[1]
+
         V = collections.defaultdict(float)  # state -> value of state
+
         numIters = 0
         while True:
             newV = {}
@@ -58,7 +62,8 @@ class ValueIteration(MDPAlgorithm):
                 V = newV
                 break
             V = newV
-            print V[(mdp.origin, mdp.start_time)]
+            # print V[(mdp.origin, mdp.start_time)]
+            print computeOptimalStartingAction(mdp, (mdp.origin, mdp.start_time), V)
 
         # Compute the optimal policy now
         pi = computeOptimalPolicy(mdp, V)
@@ -96,7 +101,6 @@ class MDP:
             for action in self.actions(state):
                 for newState, prob, reward in self.succAndProbReward(state, action):
                     if newState not in self.states:
-                        print newState
                         self.states.add(newState)
                         queue.append(newState)
         # print "%d states" % len(self.states)

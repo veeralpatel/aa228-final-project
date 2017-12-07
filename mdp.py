@@ -3,6 +3,7 @@ from collections import defaultdict
 from util import ValueIteration
 import datetime
 import cPickle
+import pickle
 
 print 'loading pkl'
 all_flights = {}
@@ -12,6 +13,12 @@ print 'done loading pkl'
 
 def hours_between(d1, d2):
     return divmod((d1 - d2).total_seconds(), 3600)[0]
+
+def minutes_between(d1, d2):
+    return divmod((d1 - d2).total_seconds(), 60)[0]
+
+def convertToDateTime(str):
+    return datetime.datetime.strptime(str, '%Y-%m-%d %H:%M:%S')
 
 class FlightMDP(util.MDP):
     def __init__(self, origin, final_destination, start_time):
@@ -30,16 +37,22 @@ class FlightMDP(util.MDP):
         all_actions = []
 
         origin = state[0]
+        currentTime = state[1]
 
         today_tomorrow_flights = all_flights[origin][state[1].timetuple().tm_yday] + all_flights[origin][state[1].timetuple().tm_yday+1]
         for flight in today_tomorrow_flights:
-            dt = datetime.datetime.strptime(flight[3], '%Y-%m-%d %H:%M:%S')
-            if hours_between(dt, self.start_time) <= 24:
+            flightNumber = flight[0]
+            originAirport = flight[1]
+            destinationAirport = flight[2]
+            scheduledDeparture = convertToDateTime(flight[3])
+            arrivalTime = convertToDateTime(flight[4])
+            elapsedTime = flight[5]
+            
+            if arrivalTime > scheduledDeparture and hours_between(scheduledDeparture, self.start_time) <= 24 and scheduledDeparture > currentTime:
                 # flight number, departure time, destination, real arrival time, elapsed time
-                all_actions.append((flight[0],datetime.datetime.strptime(flight[3], '%Y-%m-%d %H:%M:%S'),flight[2],datetime.datetime.strptime(flight[4], '%Y-%m-%d %H:%M:%S'),flight[5]))
+                all_actions.append((flightNumber, scheduledDeparture, destinationAirport, arrivalTime, elapsedTime))
             else:
                 break
-
         if len(all_actions) == 0:
             return [('QUIT',None,None,None,None)]
         else:
@@ -58,7 +71,7 @@ class FlightMDP(util.MDP):
         currentDatetime = state[1]
 
         flight_number = action[0]
-        departure_time = action[1]
+        scheduledDeparture = action[1]
         destination = action[2]
         real_arrival_time = action[3]
         elapsed_time = action[4]
@@ -66,26 +79,19 @@ class FlightMDP(util.MDP):
         if currentLocation == self.final_destination:
             return []
         else:
-            delta_between_flights = (departure_time - currentDatetime).total_seconds()
-            # delta_between_flights = delta_between_flights.total_seconds()
+            delta_between_flights = -1*minutes_between(departure_time, currentDatetime)
 
             # cancelled flight 
             succCancelled = (currentLocation, departure_time)
             probCancelled = 0.2
-            if delta_between_flights != 0:
-                rewardCancelled = 1/float((departure_time - currentDatetime).total_seconds())
-            else:
-                rewardCancelled = 0
+            rewardCancelled = delta_between_flights
 
             # regular flight, not cancelled
             succ = (destination, real_arrival_time)
             prob = 1
-            if delta_between_flights != 0:
-                reward = 1/float((departure_time - currentDatetime).total_seconds()) + 1/float(60*elapsed_time)
-            else:
-                reward = 1/float(60*elapsed_time)
+            reward = delta_between_flights - elapsed_time
 
-            return [(succCancelled, probCancelled, rewardCancelled), (succ, prob, reward)]
+            return [(succCancelled, probCancelled, 0), (succ, prob, reward)]
 
     def discount(self):
         return 1
@@ -96,6 +102,28 @@ alg.solve(mdp, .0001)
 
 print alg.V
 print alg.pi
+
+with open('value_function.pickle', 'wb') as handle:
+    pickle.dump(alg.V, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+with open('optimal_policy.pickle', 'wb') as handle:
+    pickle.dump(alg.pi, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+print 'dumped new policies'
+
+print 'printing final path'
+
+state = (mdp.origin, mdp.start_time)
+path = []
+while True:
+    if state[0] == 'SFO':
+        break
+    else:
+        action = optimal_policy[state]
+        path.append(action)
+        state = (action[2],action[3])
+        
+print path
 
 ############################################################
 # Problem 4a: Q learning
