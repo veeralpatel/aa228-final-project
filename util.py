@@ -56,12 +56,12 @@ class ValueIteration(MDPAlgorithm):
                 # This evaluates to zero for end states, which have no available actions (by definition)
                 newV[state] = max(computeQ(mdp, V, state, action) for action in mdp.actions(state))
             numIters += 1
-            if min(abs(V[state] - newV[state]) for state in mdp.states) < epsilon:
+            if max(abs(V[state] - newV[state]) for state in mdp.states) < epsilon:
                 V = newV
                 break
             V = newV
-            print V[(mdp.origin, mdp.start_time)]
-            print computeOptimalStartingAction(mdp, (mdp.origin, mdp.start_time), V)
+            print V[(mdp.initial_origin, mdp.start_time)]
+            print computeOptimalStartingAction(mdp, (mdp.initial_origin, mdp.start_time), V)
 
         # Compute the optimal policy now
         pi = computeOptimalPolicy(mdp, V)

@@ -21,15 +21,16 @@ def convertToDateTime(str):
     return datetime.datetime.strptime(str, '%Y-%m-%d %H:%M:%S')
 
 class FlightMDP(util.MDP):
-    def __init__(self, origin, final_destination, start_time):
-        self.origin = origin
+    def __init__(self, initial_origin, final_destination, start_time, prune_direct):
+        self.initial_origin = initial_origin
         self.start_time = start_time
         self.final_destination = final_destination
+        self.prune_direct = prune_direct
 
     # Return the start state.
     # States are your current airport and datetime
     def startState(self):
-        return (self.origin, self.start_time)
+        return (self.initial_origin, self.start_time)
 
     # Return set of actions possible from |state|.
     # Return all the flights you can take from an airport that are after your current time
@@ -53,12 +54,17 @@ class FlightMDP(util.MDP):
             arrivalTime = convertToDateTime(flight[4])
             elapsedTime = flight[5]
 
+            if (self.prune_direct):
+                if state == self.startState() and origin == self.initial_origin and destinationAirport == self.final_destination:
+                    break;
+
             if hours_between(scheduledDeparture, self.start_time) > 24:
                 break 
-            
+
             if arrivalTime > scheduledDeparture and scheduledDeparture > currentTime:
                 # flight number, departure time, destination, real arrival time, elapsed time
-                all_actions.append((flightNumber, scheduledDeparture, destinationAirport, arrivalTime, elapsedTime))
+                all_actions.append((flightNumber, scheduledDeparture, destinationAirport, arrivalTime, elapsedTime)) 
+
         if len(all_actions) == 0:
             return [('QUIT',None,None,None,None)]
         else:
@@ -104,12 +110,12 @@ class FlightMDP(util.MDP):
     def discount(self):
         return 1
 
-mdp = FlightMDP(origin='EWR', start_time=datetime.datetime(2015, 1, 11, 8, 30), final_destination='SFO')
+mdp = FlightMDP(initial_origin='EWR', start_time=datetime.datetime(2015, 1, 11, 8, 30), final_destination='SFO', prune_direct=True)
 alg = util.ValueIteration()
-alg.solve(mdp, .0001)
+alg.solve(mdp, 0.1)
 
-print alg.V
-print alg.pi
+# print alg.V
+# print alg.pi
 
 with open('value_function.pickle', 'wb') as handle:
     pickle.dump(alg.V, handle, protocol=pickle.HIGHEST_PROTOCOL)
