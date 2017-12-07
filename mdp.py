@@ -71,7 +71,7 @@ class FlightMDP(util.MDP):
         currentDatetime = state[1]
 
         flight_number = action[0]
-        scheduledDeparture = action[1]
+        scheduled_departure = action[1]
         destination = action[2]
         real_arrival_time = action[3]
         elapsed_time = action[4]
@@ -79,10 +79,10 @@ class FlightMDP(util.MDP):
         if currentLocation == self.final_destination:
             return []
         else:
-            delta_between_flights = -1*minutes_between(departure_time, currentDatetime)
+            delta_between_flights = -1*minutes_between(scheduled_departure, currentDatetime)
 
             # cancelled flight 
-            succCancelled = (currentLocation, departure_time)
+            succCancelled = (currentLocation, scheduled_departure)
             probCancelled = 0.2
             rewardCancelled = delta_between_flights
 
@@ -119,7 +119,7 @@ while True:
     if state[0] == 'SFO':
         break
     else:
-        action = optimal_policy[state]
+        action = alg.pi[state]
         path.append(action)
         state = (action[2],action[3])
         
