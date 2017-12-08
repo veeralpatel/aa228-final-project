@@ -32,7 +32,8 @@ class FlightMDP(util.MDP):
     # Return the start state.
     # States are your current airport and datetime
     def startState(self):
-        return (self.initial_origin, self.start_time)
+        # current location, current time, legs taken
+        return (self.initial_origin, self.start_time, 0)
 
     # Return set of actions possible from |state|.
     # Return all the flights you can take from an airport that are after your current time
@@ -41,6 +42,7 @@ class FlightMDP(util.MDP):
 
         origin = state[0]
         currentTime = state[1]
+        currentNumLegs = state[2]
 
         if origin == self.final_destination:
             return [('DONE',None,None,None,None)]
@@ -67,7 +69,7 @@ class FlightMDP(util.MDP):
                 # flight number, departure time, destination, real arrival time, elapsed time
                 all_actions.append((flightNumber, scheduledDeparture, destinationAirport, arrivalTime, elapsedTime)) 
 
-        if len(all_actions) == 0:
+        if len(all_actions) == 0 or (currentNumLegs == 3 and origin != self.final_destination):
             return [('QUIT',None,None,None,None)]
         else:
             return all_actions
@@ -81,10 +83,11 @@ class FlightMDP(util.MDP):
         if action[0] == 'DONE':
             return []
         elif action[0] == 'QUIT':
-            return [(('QUIT',None),1.0,-100000)]
+            return [(('QUIT',None,state[2]),1.0,-100000)]
 
         currentLocation = state[0]
         currentDatetime = state[1]
+        currentNumLegs = state[2]
 
         flight_number = action[0]
         scheduled_departure = action[1]
@@ -92,23 +95,32 @@ class FlightMDP(util.MDP):
         real_arrival_time = action[3]
         elapsed_time = action[4]
 
+        if currentNumLegs > 3:
+            return [(('QUIT',None,state[2]),1.0,-100000)]
+
         if currentLocation == self.final_destination:
             return []
         else:
             delta_between_flights = -1*minutes_between(scheduled_departure, currentDatetime)
 
             # cancelled flight 
-            succCancelled = (currentLocation, scheduled_departure)
+            succCancelled = (currentLocation, scheduled_departure, currentNumLegs)
             probCancelled = 0.2
             rewardCancelled = delta_between_flights
+            cancelled_flight = (succCancelled, probCancelled, rewardCancelled)
 
             # regular flight, not cancelled
-            succ = (destination, real_arrival_time)
+            succ = (destination, real_arrival_time, currentNumLegs + 1)
             prob = 0.8
-            noisy_elapsed_time = get_truncated_normal(mean=elapsed_time, sd=30, low=elapsed_time, upp=elapsed_time+120)
-            reward = delta_between_flights - noisy_elapsed_time.rvs()
+            #noisy_elapsed_time = get_truncated_normal(mean=elapsed_time, sd=30, low=elapsed_time, upp=elapsed_time+120)
+            reward = delta_between_flights - elapsed_time#- noisy_elapsed_time.rvs()
+            good_flight = (succ, prob, reward)
 
-            return [(succCancelled, probCancelled, 0), (succ, prob, reward)]
+            actions = [cancelled_flight, good_flight]
+            # if currentNumLegs <3:
+            #     actions = [cancelled_flight, good_flight]
+
+            return actions
 
     def discount(self):
         return 1

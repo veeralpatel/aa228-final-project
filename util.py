@@ -24,13 +24,13 @@ class ValueIteration(MDPAlgorithm):
     def solve(self, mdp, epsilon=0.001):
         print 'computing states'
         #mdp.computeStates()
-        with open('EWR_states.pkl', 'rb') as f:
+        with open('pruned_EWR_states.pkl', 'rb') as f:
             states = pickle.load(f)
         mdp.states = states
         print 'done computing'
         print len(mdp.states)
-        with open('EWR_states.pkl', 'wb') as f:
-            pickle.dump(mdp.states, f)
+        # with open('pruned_EWR_states.pkl', 'wb') as f:
+        #     pickle.dump(mdp.states, f)
 
         def computeQ(mdp, V, state, action):
             # Return Q(state, action) based on V(state).
@@ -60,8 +60,8 @@ class ValueIteration(MDPAlgorithm):
                 V = newV
                 break
             V = newV
-            print V[(mdp.initial_origin, mdp.start_time)]
-            print computeOptimalStartingAction(mdp, (mdp.initial_origin, mdp.start_time), V)
+            print V[mdp.startState()]
+            print computeOptimalStartingAction(mdp, mdp.startState(), V)
 
         # Compute the optimal policy now
         pi = computeOptimalPolicy(mdp, V)
@@ -98,7 +98,7 @@ class MDP:
             state = queue.pop()
             for action in self.actions(state):
                 for newState, prob, reward in self.succAndProbReward(state, action):
-                    if newState not in self.states:
+                    if newState not in self.states and newState[2] <= 3:
                         self.states.add(newState)
                         queue.append(newState)
         # print "%d states" % len(self.states)
