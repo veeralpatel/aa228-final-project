@@ -4,6 +4,9 @@ from util import ValueIteration
 import numpy as np
 import cPickle as pickle
 from scipy.stats import truncnorm
+import numpy as np
+
+np.random.seed(11)
 
 
 def hours_between(d1, d2):
