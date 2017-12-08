@@ -172,7 +172,7 @@ print 'printing final path'
 state = mdp.startState()
 path = [(state, None)]
 while True:
-    if state[0] == mpd.final_destination:
+    if state[0] == mdp.final_destination:
         break
     else:
         action = alg.pi[state]
