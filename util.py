@@ -23,14 +23,8 @@ class ValueIteration(MDPAlgorithm):
     '''
     def solve(self, mdp, epsilon=0.001):
         print 'computing states'
-        #mdp.computeStates()
-        with open('pruned_EWR_states.pkl', 'rb') as f:
-            states = pickle.load(f)
-        mdp.states = states
-        print 'done computing'
+        mdp.computeStates()
         print len(mdp.states)
-        # with open('pruned_EWR_states.pkl', 'wb') as f:
-        #     pickle.dump(mdp.states, f)
 
         def computeQ(mdp, V, state, action):
             # Return Q(state, action) based on V(state).
