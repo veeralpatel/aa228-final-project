@@ -117,7 +117,7 @@ class FlightMDP(util.MDP):
             if action in stochastic_rewards:
                 noisy_elapsed_time = stochastic_rewards[action]
             else:
-                stochastic_rewards[action] = get_truncated_normal(mean=elapsed_time, sd=100, low=elapsed_time, upp=elapsed_time+120).rvs()
+                stochastic_rewards[action] = get_truncated_normal(mean=elapsed_time, sd=30, low=elapsed_time, upp=elapsed_time+120).rvs()
                 noisy_elapsed_time = stochastic_rewards[action]
             reward = delta_between_flights - noisy_elapsed_time
             good_flight = (succ, prob, reward)
@@ -181,3 +181,4 @@ while True:
         print 'a: ', action
         state = (action[2],action[3],state[2]+1)
         path.append((state,action,state[2]+1))
+
