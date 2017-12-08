@@ -61,7 +61,7 @@ class FlightMDP(util.MDP):
 
             if (self.prune_direct):
                 if state == self.startState() and origin == self.initial_origin and destinationAirport == self.final_destination:
-                    break;
+                    continue;
 
             if hours_between(scheduledDeparture, self.start_time) > 24:
                 break 
