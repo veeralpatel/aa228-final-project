@@ -169,7 +169,7 @@ print 'dumped new policies'
 
 print 'printing final path'
 
-state = (mdp.origin, mdp.start_time)
+state = mdp.startState()
 path = [(state, None)]
 while True:
     if state[0] == mpd.final_destination:
@@ -177,7 +177,7 @@ while True:
     else:
         action = alg.pi[state]
         state = (action[2],action[3])
-        path.append((state,action))
+        path.append((state,action,state[2]+1))
         
 print path
 
