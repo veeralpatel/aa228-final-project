@@ -120,6 +120,8 @@ parser.add_argument('--pruneDirect', action='store', dest='prune_direct', type=b
 parser.add_argument('--epsilon', action='store', dest='epsilon', type=float, default=0.1)
 parser.add_argument('--origin', action='store', dest='initial_origin', type=str, default='EWR')
 parser.add_argument('--destination', action='store', dest='final_destination', type=str, default='SFO')
+parser.add_argument('--outputPolicyFN', action='store', dest='output_policy_fn', type=str, default='optimal_policy.pkl')
+parser.add_argument('--outputValueFN', action='store', dest='output_value_fn', type=str, default='value_function.pkle')
 results = parser.parse_args()
 
 # set vars to parser arguments or defaults
@@ -127,6 +129,8 @@ prune_direct = results.prune_direct
 epsilon = results.epsilon
 initial_origin = results.initial_origin
 destination = results.final_destination
+policy_filename = results.output_policy_fn
+value_filename = results.output_value_fn
 
 print 'loading pkl'
 all_flights = {}
@@ -143,27 +147,27 @@ alg.solve(mdp, epsilon)
 # print alg.V
 # print alg.pi
 
-with open('value_function.pickle', 'wb') as handle:
+with open(value_filename, 'wb') as handle:
     pickle.dump(alg.V, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-with open('optimal_policy.pickle', 'wb') as handle:
+with open(policy_filename, 'wb') as handle:
     pickle.dump(alg.pi, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 print 'dumped new policies'
 
-# print 'printing final path'
+print 'printing final path'
 
-# state = (mdp.origin, mdp.start_time)
-# path = []
-# while True:
-#     if state[0] == 'SFO':
-#         break
-#     else:
-#         action = alg.pi[state]
-#         path.append(action)
-#         state = (action[2],action[3])
+state = (mdp.origin, mdp.start_time)
+path = [(state, None)]
+while True:
+    if state[0] == mpd.final_destination:
+        break
+    else:
+        action = alg.pi[state]
+        state = (action[2],action[3])
+        path.append((state,action))
         
-# print path
+print path
 
 ############################################################
 # Problem 4a: Q learning
