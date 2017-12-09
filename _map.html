@@ -1,0 +1,39 @@
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+  <style>
+    #mapb99477cab468411d87db125cf0cae068 {
+      height:100%;
+    }
+  </style> 
+</head>
+<body>
+  <div id="mapb99477cab468411d87db125cf0cae068"></div>
+<script text="text/javascript">
+var map = L.map('mapb99477cab468411d87db125cf0cae068');
+L.tileLayer(
+  "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {maxZoom:19, attribution: '<a href="https://github.com/jwass/mplleaflet">mplleaflet</a> | Map data (c) <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'}).addTo(map);
+var gjData = {"type": "FeatureCollection", "features": [{"geometry": {"type": "LineString", "coordinates": [[-157.92241, 21.31869], [-118.40807, 33.94254], [-71.00518000000001, 42.36435]]}, "type": "Feature", "properties": {"color": "#FF0000", "opacity": 1, "weight": 1.5}}, {"geometry": {"type": "Point", "coordinates": [-157.92241000000001, 21.31869]}, "type": "Feature", "properties": {"anchor_x": 4.0, "html": "<svg width=\"8px\" height=\"8px\" viewBox=\"-4.0 -4.0 8.0 8.0\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">  <path d=\"M 0.0 -3.0 C 0.7956093 -3.0 1.55873961235 -2.68390107476 2.12132034356 -2.12132034356 C 2.68390107476 -1.55873961235 3.0 -0.7956093 3.0 -0.0 C 3.0 0.7956093 2.68390107476 1.55873961235 2.12132034356 2.12132034356 C 1.55873961235 2.68390107476 0.7956093 3.0 0.0 3.0 C -0.7956093 3.0 -1.55873961235 2.68390107476 -2.12132034356 2.12132034356 C -2.68390107476 1.55873961235 -3.0 0.7956093 -3.0 -0.0 C -3.0 -0.7956093 -2.68390107476 -1.55873961235 -2.12132034356 -2.12132034356 C -1.55873961235 -2.68390107476 -0.7956093 -3.0 0.0 -3.0 Z\" fill-opacity=\"1\" stroke=\"#FF0000\" stroke-width=\"1.0\" stroke-opacity=\"1\" fill=\"#FF0000\" /></svg>", "anchor_y": 4.0}}, {"geometry": {"type": "Point", "coordinates": [-118.40807, 33.942540000000001]}, "type": "Feature", "properties": {"anchor_x": 4.0, "html": "<svg width=\"8px\" height=\"8px\" viewBox=\"-4.0 -4.0 8.0 8.0\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">  <path d=\"M 0.0 -3.0 C 0.7956093 -3.0 1.55873961235 -2.68390107476 2.12132034356 -2.12132034356 C 2.68390107476 -1.55873961235 3.0 -0.7956093 3.0 -0.0 C 3.0 0.7956093 2.68390107476 1.55873961235 2.12132034356 2.12132034356 C 1.55873961235 2.68390107476 0.7956093 3.0 0.0 3.0 C -0.7956093 3.0 -1.55873961235 2.68390107476 -2.12132034356 2.12132034356 C -2.68390107476 1.55873961235 -3.0 0.7956093 -3.0 -0.0 C -3.0 -0.7956093 -2.68390107476 -1.55873961235 -2.12132034356 -2.12132034356 C -1.55873961235 -2.68390107476 -0.7956093 -3.0 0.0 -3.0 Z\" fill-opacity=\"1\" stroke=\"#FF0000\" stroke-width=\"1.0\" stroke-opacity=\"1\" fill=\"#FF0000\" /></svg>", "anchor_y": 4.0}}, {"geometry": {"type": "Point", "coordinates": [-71.00518000000001, 42.364350000000002]}, "type": "Feature", "properties": {"anchor_x": 4.0, "html": "<svg width=\"8px\" height=\"8px\" viewBox=\"-4.0 -4.0 8.0 8.0\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">  <path d=\"M 0.0 -3.0 C 0.7956093 -3.0 1.55873961235 -2.68390107476 2.12132034356 -2.12132034356 C 2.68390107476 -1.55873961235 3.0 -0.7956093 3.0 -0.0 C 3.0 0.7956093 2.68390107476 1.55873961235 2.12132034356 2.12132034356 C 1.55873961235 2.68390107476 0.7956093 3.0 0.0 3.0 C -0.7956093 3.0 -1.55873961235 2.68390107476 -2.12132034356 2.12132034356 C -2.68390107476 1.55873961235 -3.0 0.7956093 -3.0 -0.0 C -3.0 -0.7956093 -2.68390107476 -1.55873961235 -2.12132034356 -2.12132034356 C -1.55873961235 -2.68390107476 -0.7956093 -3.0 0.0 -3.0 Z\" fill-opacity=\"1\" stroke=\"#FF0000\" stroke-width=\"1.0\" stroke-opacity=\"1\" fill=\"#FF0000\" /></svg>", "anchor_y": 4.0}}]};
+
+if (gjData.features.length != 0) {
+  var gj = L.geoJson(gjData, {
+    style: function (feature) {
+      return feature.properties;
+    },
+    pointToLayer: function (feature, latlng) {
+      var icon = L.divIcon({'html': feature.properties.html, 
+        iconAnchor: [feature.properties.anchor_x, 
+                     feature.properties.anchor_y], 
+          className: 'empty'});  // What can I do about empty?
+      return L.marker(latlng, {icon: icon});
+    }
+  });
+  gj.addTo(map);
+  
+  map.fitBounds(gj.getBounds());
+} else {
+  map.setView([0, 0], 1);
+}
+</script>
+</body>
